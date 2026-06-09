@@ -1,16 +1,16 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405). json({ error: 'Method not allowed' });
   }
 
   const { message } = req.body;
   if (!message || typeof message !== 'string') {
-    return res.status(400).json({ error: '请写点什么' });
+    return res.status(400). json({ error: '请写点什么' });
   }
 
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: '服务配置错误，缺少 API Key' });
+    return res.status(500). json({ error: '服务配置错误，缺少 API Key' });
   }
 
   const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -36,9 +36,9 @@ export default async function handler(req, res) {
   const data = await response.json();
   if (!response.ok) {
     console.error(data);
-    return res.status(500).json({ error: 'AI 暂时无法回应' });
+    return res.status(500). json({ error: 'AI 暂时无法回应' });
   }
 
   const reply = data.choices[0].message.content;
-  res.status(200).json({ reply });
+  res.status(200). json({ reply });
 }
