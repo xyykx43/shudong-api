@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>树洞 · 匿名心事</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #e9e2d0;
+            font-family: Georgia, 'Times New Roman', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #fffaf0;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-size: 1.6rem;
+            text-align: center;
+            font-weight: normal;
+            border-bottom: 1px solid #e0d6c4;
+            display: inline-block;
+            width: 100%;
+            padding-bottom: 6px;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            border: 1px solid #d4c5a9;
+            border-radius: 12px;
+            background: #fffef7;
+            resize: vertical;
+            margin-bottom: 16px;
+        }
+        button {
+            background: none;
+            border: 1px solid #cbbf9a;
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #f0e8da;
+        }
+        .reply {
+            margin-top: 24px;
+            border-top: 1px dashed #e0d6c4;
+            padding-top: 20px;
+        }
+        .reply-label {
+            font-size: 0.75rem;
+            color: #9b876b;
+            letter-spacing: 2px;
+        }
+        .reply-content {
+            background: #fef8ef;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 8px;
+            line-height: 1.6;
+            color: #2e2a24;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #b5a27e;
+            margin-top: 28px;
+        }
+        .loading {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🌿 树洞 · 听你说</h1>
+    <textarea id="userInput" rows="4" placeholder="写点什么..."></textarea>
+    <button id="sendBtn">倾听</button>
+    <div id="replyBlock" class="reply" style="display: none;">
+        <div class="reply-label">✦ 树洞的回声 ✦</div>
+        <div id="replyText" class="reply-content"></div>
+    </div>
+    <footer>❁ 匿名 · 不记名 ❁</footer>
+</div>
+
+<script>
+    // 后端 API 地址（你的 Vercel 域名 + /api/treehole）
+    const API_URL = 'https://shudong-api.vercel.app/api/treehole';
+
+    const input = document.getElementById('userInput');
+    const btn = document.getElementById('sendBtn');
+    const replyBlock = document.getElementById('replyBlock');
+    const replyText = document.getElementById('replyText');
+
+    btn.addEventListener('click', async () => {
+        const msg = input.value.trim();
+        if (!msg) {
+            alert("写点什么再点倾听");
+            return;
+        }
+
+        replyBlock.style.display = 'block';
+        replyText.innerHTML = '🌙 正在倾听...';
+        btn.disabled = true;
+        btn.classList.add('loading');
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || '请求失败');
+            replyText.innerHTML = data.reply;
+        } catch (err) {
+            replyText.innerHTML = '🌙 树洞走神了，稍后再试。错误：' + err.message;
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        }
+    });
+</script>
+</body>
+</html>
